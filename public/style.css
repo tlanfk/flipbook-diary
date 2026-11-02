@@ -1,0 +1,283 @@
+/* 일기장 — toss/book 의 펼친 책 화면(FlipBook.module.css)을 그대로 가져왔다 */
+*, *::before, *::after { box-sizing: border-box; }
+:root {
+  --brand: #24463d;
+  --ink-2: #4b4237;
+  --font-ui: 'Noto Sans KR', 'Apple SD Gothic Neo', 'Malgun Gothic', system-ui, sans-serif;
+}
+html, body { margin: 0; height: 100%; }
+body { background: #ebe4d6; color: #231e18; font-family: var(--font-ui); -webkit-font-smoothing: antialiased; }
+button { font: inherit; }
+:focus-visible { outline: 3px solid #2563eb; outline-offset: 3px; }
+
+/* ---------- 화면 ---------- */
+.reader {
+  position: fixed;
+  inset: 0;
+  padding: calc(52px + env(safe-area-inset-top)) max(3vmin, env(safe-area-inset-right)) max(3vmin, env(safe-area-inset-bottom)) max(3vmin, env(safe-area-inset-left));
+  background: #ebe4d6;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+.book { width: 100%; height: 100%; }
+
+.topbar {
+  position: absolute;
+  top: env(safe-area-inset-top);
+  left: 0;
+  right: 0;
+  height: 48px;
+  display: grid;
+  grid-template-columns: 1fr minmax(0, 360px) 1fr; /* 검색바가 화면 한가운데 오게 */
+  align-items: center;
+  gap: 8px;
+  padding: 0 max(12px, env(safe-area-inset-right)) 0 max(12px, env(safe-area-inset-left));
+  z-index: 10;
+}
+.title { font-size: 14px; color: var(--ink-2); padding-left: 4px; }
+.btn {
+  min-height: 44px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.92);
+  color: var(--brand);
+  font-size: 14px;
+  font-weight: 500;
+  box-shadow: 0 1px 4px rgba(60, 40, 10, 0.18);
+  cursor: pointer;
+}
+.btn:hover { background: #fffdf8; }
+.btn:disabled { opacity: 0.6; cursor: default; }
+.editing #mode { background: var(--brand); color: #fffdf8; }
+.actions { display: flex; gap: 8px; justify-self: end; }
+
+/* ---------- 검색 ---------- */
+.search { margin: 0; min-width: 0; }
+.search input {
+  width: 100%;
+  height: 40px;
+  padding: 0 16px;
+  border: 0;
+  border-radius: 999px;
+  background: rgba(255, 253, 248, 0.92);
+  color: #231e18;
+  font: inherit;
+  font-size: 14px;
+  box-shadow: 0 1px 4px rgba(60, 40, 10, 0.18);
+  outline: none;
+  user-select: text;
+  -webkit-user-select: text;
+}
+.search input:focus { box-shadow: 0 0 0 2px var(--brand); background: #fffdf8; }
+
+.popup {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  display: grid;
+  place-items: center;
+  padding: 16px;
+  background: rgba(35, 30, 24, 0.35);
+}
+.popup[hidden] { display: none; }
+.popupBox {
+  width: min(520px, 100%);
+  max-height: min(70vh, 600px);
+  display: flex;
+  flex-direction: column;
+  background: #fffdf8;
+  border-radius: 16px;
+  box-shadow: 0 8px 30px rgba(60, 40, 10, 0.3);
+  overflow: hidden;
+}
+.popupHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 12px 12px 20px;
+  border-bottom: 1px solid #eee6d8;
+  color: var(--ink-2);
+  font-size: 14px;
+}
+.popupClose {
+  width: 36px;
+  height: 36px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--ink-2);
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+.popupClose:hover { background: #f3ede2; }
+.results { list-style: none; margin: 0; padding: 6px; overflow-y: auto; }
+.results button {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 10px;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+}
+.results button:hover, .results button:focus-visible { background: #f3ede2; }
+.resultMeta { display: block; font-size: 12px; color: #77716a; margin-bottom: 2px; }
+.resultText {
+  display: block;
+  font-family: 'Noto Serif KR', 'Nanum Myeongjo', 'Batang', serif;
+  font-size: 14px;
+  color: #2b2b2b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.resultText mark { background: #f6dd8a; color: inherit; border-radius: 2px; }
+.resultEmpty { padding: 24px; text-align: center; color: #77716a; font-size: 14px; }
+.btnNew { display: none; }
+.editing .btnNew { display: inline-block; }
+
+/* 편집모드에서는 끌어서 넘기기를 끄므로(글자를 고르는 손짓과 겹친다) 양옆 화살표로 넘긴다 */
+.turn {
+  display: none;
+  position: absolute;
+  top: 50%;
+  z-index: 10;
+  width: 44px;
+  height: 64px;
+  margin-top: -32px;
+  border: 0;
+  border-radius: 12px;
+  background: rgba(255, 253, 248, 0.85);
+  color: var(--brand);
+  font-size: 30px;
+  line-height: 1;
+  box-shadow: 0 1px 4px rgba(60, 40, 10, 0.18);
+  cursor: pointer;
+}
+.turnPrev { left: max(4px, env(safe-area-inset-left)); }
+.turnNext { right: max(4px, env(safe-area-inset-right)); }
+.editing .turn { display: block; }
+
+@media (max-width: 719px) {
+  .topbar { grid-template-columns: auto minmax(0, 1fr) auto; }
+  .reader {
+    padding: calc(48px + env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(10px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+  }
+}
+
+.msg {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  color: #666;
+  pointer-events: none;
+}
+.msg[hidden] { display: none; }
+
+/* ---------- 쪽 ---------- */
+/* 글자·여백은 모두 cqw(쪽 너비 비율)라서 PC·폰 어디서 봐도 줄바꿈이 같다 */
+.page {
+  container-type: inline-size;
+  background: #fbf8f1;
+  color: #2b2b2b;
+  font-family: 'Noto Serif KR', 'Nanum Myeongjo', 'Batang', serif;
+  overflow: hidden;
+}
+.inner {
+  height: 100%;
+  display: grid;
+  grid-template-rows: minmax(0, 1fr) auto; /* 글 칸과 노란 표시 층이 같은 자리(1행)에 겹친다 */
+  padding: 10cqw 9cqw 6cqw;
+  font-size: var(--fs, 2.85cqw); /* app.js 가 화면에 맞춰 정한다 (PC 2.85cqw, 폰은 읽기 좋은 px 이 되게) */
+  line-height: 1.75;
+}
+/* 글자 칸: 읽을 때나 고칠 때나 같은 글자 칸이라 편집모드로 바꿔도 화면이 그대로다 */
+.text {
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  resize: none;
+  overflow: hidden;
+  white-space: pre-wrap;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  pointer-events: none; /* 읽을 때는 끌어서 넘기기가 되게 */
+}
+.editing .text { pointer-events: auto; cursor: text; user-select: text; -webkit-user-select: text; }
+.text, .hl { grid-area: 1 / 1; }
+/* 검색해서 고른 자리 표시: 글 칸 뒤에 같은 글을 투명하게 깔고 찾은 부분만 노란색으로 칠한다 */
+.hl {
+  overflow: hidden;
+  white-space: pre-wrap;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+  color: transparent;
+  pointer-events: none;
+}
+.hl mark { background: #f6dd8a; color: transparent; border-radius: 2px; }
+.stf__item.--back .hl { visibility: hidden; } /* 넘기는 종이 뒷면(복제본)은 예전 표시가 남아 있을 수 있어 숨긴다 */
+.num { grid-row: 2; text-align: center; font-size: 2.9cqw; color: #77716a; height: 6cqw; }
+
+/* 종이의 빛: 책등 쪽 제본 음영 */
+.shade { position: absolute; inset: 0; z-index: 5; pointer-events: none; }
+.shadeLeft {
+  background:
+    linear-gradient(to left, rgba(0, 0, 0, 0.29) 0%, rgba(0, 0, 0, 0.22) 1.8%, rgba(0, 0, 0, 0.12) 3.7%, rgba(0, 0, 0, 0.02) 5.5%,
+      rgba(255, 255, 255, 0) 6.6%, rgba(255, 255, 255, 0.027) 8.4%, rgba(255, 255, 255, 0.078) 11.1%, rgba(255, 255, 255, 0.1) 13.9%,
+      rgba(255, 255, 255, 0.078) 16.7%, rgba(255, 255, 255, 0.035) 19.4%, rgba(255, 255, 255, 0) 22%),
+    rgba(0, 0, 0, 0.025);
+}
+.shadeRight {
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.235) 1.1%, rgba(0, 0, 0, 0.15) 2.2%, rgba(0, 0, 0, 0.05) 3.3%,
+    rgba(0, 0, 0, 0) 4.2%, rgba(255, 255, 255, 0.031) 5.5%, rgba(255, 255, 255, 0.027) 6.6%, rgba(255, 255, 255, 0.016) 7.7%, rgba(255, 255, 255, 0) 8.8%);
+}
+.shadeSingle {
+  background: linear-gradient(to right, rgba(0, 0, 0, 0.3) 0%, rgba(0, 0, 0, 0.235) 1.1%, rgba(0, 0, 0, 0.15) 2.2%, rgba(0, 0, 0, 0.05) 3.4%,
+    rgba(0, 0, 0, 0) 4.3%, rgba(255, 255, 255, 0.03) 5.6%, rgba(255, 255, 255, 0.025) 7%, rgba(255, 255, 255, 0) 8.5%);
+}
+
+/* 글이 쪽에 다 들어가는지 재는 칸 (화면 밖). 아주 조금 좁게 재서 어느 화면 크기에서도 마지막 줄이 잘리지 않게 한다 */
+.measure { position: fixed; left: -10000px; top: 0; visibility: hidden; width: 530px; height: 600px; }
+.measure .text { width: 99.5%; }
+
+/* ---------- 폰 ---------- */
+/* 세로 폰: 한 쪽이 화면을 채운다 */
+[data-view="up"] .inner { padding: 9cqw 7cqw 3cqw; }
+[data-view="up"] .num { font-size: 3cqw; height: 7cqw; }
+/* 가로 폰: 낮은 펼침면이라 위아래 여백을 줄인다 */
+[data-view="side"] .inner { padding: 6cqw 7cqw 2cqw; }
+[data-view="side"] .num { font-size: 2.6cqw; height: 5cqw; }
+
+/* 폰에서는 넘김 화살표를 글자 위가 아니라 화면 아래 구석에 둔다 */
+@media (max-width: 719px), (max-height: 500px) {
+  .turn {
+    top: auto;
+    bottom: max(6px, env(safe-area-inset-bottom));
+    margin-top: 0;
+    width: 40px;
+    height: 40px;
+    font-size: 24px;
+  }
+}
+/* 가로 폰: 위쪽 바를 낮춰 책 자리를 넓힌다 */
+@media (max-height: 500px) {
+  .reader { padding-top: calc(42px + env(safe-area-inset-top)); padding-bottom: max(6px, env(safe-area-inset-bottom)); }
+  .topbar { height: 40px; }
+  .btn { min-height: 34px; padding: 0 14px; font-size: 13px; }
+  .search input { height: 32px; font-size: 13px; }
+}

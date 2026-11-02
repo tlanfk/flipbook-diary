@@ -1,0 +1,84 @@
+.stf__parent {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+  transform: translateZ(0);
+
+  -ms-touch-action: pan-y;
+  touch-action: pan-y;
+}
+
+.sft__wrapper {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.stf__parent canvas {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  left: 0;
+  top: 0;
+}
+
+.stf__block {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  perspective: 2000px;
+}
+
+.stf__item {
+  display: none;
+  position: absolute;
+  transform-style: preserve-3d;
+}
+
+/* [modified] back side of the turning sheet in the one-page layout (FlipHTML5): the page's paper colour with the
+   page itself showing through, mirrored, at 20% */
+.stf__item.--back > * {
+  transform: scaleX(-1);
+  opacity: 0.2;
+}
+
+/* [modified] light and shadow layers while a page turns (HTMLRender.drawSoftShadows) */
+.stf__shadow {
+  position: absolute;
+  left: 0;
+  top: 0;
+  pointer-events: none;
+}
+
+.stf__hardShadow {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.stf__hardInnerShadow {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+/* [modified] thickness of the book: edges of the stacked pages on both outer sides.
+   The page lines are drawn by HTMLRender.drawStacks (they depend on the thickness). */
+.stf__stack {
+  position: absolute;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.stf__stackLeft {
+  border-radius: 3px 0 0 3px;
+  box-shadow: -2px 1px 5px rgba(0, 0, 0, 0.22);
+  transform-origin: 100% 50%;
+}
+
+.stf__stackRight {
+  border-radius: 0 3px 3px 0;
+  box-shadow: 2px 1px 5px rgba(0, 0, 0, 0.22);
+  transform-origin: 0 50%;
+}

@@ -1,0 +1,13 @@
+{
+  "name": "diary",
+  "private": true,
+  "scripts": {
+    "build": "esbuild vendor/page-flip/PageFlip.ts --bundle --format=iife --global-name=St --minify --outfile=public/page-flip.js",
+    "dev": "npm run build && wrangler dev --port 8790",
+    "deploy": "npm run build && wrangler deploy"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.10",
+    "wrangler": "4.120.1"
+  }
+}

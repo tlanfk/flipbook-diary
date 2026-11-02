@@ -1,0 +1,11 @@
+# 일기 데이터 — 절대 올리지 않음
+.wrangler/
+백업_*.json
+*.sqlite
+*.sqlite-*
+
+# 개인 메모(퍼온 글)
+public/일기 잘 쓰는 법.txt
+
+# 설치물
+node_modules/
