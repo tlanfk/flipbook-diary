@@ -1,14 +1,11 @@
-# 일기 데이터 — 절대 올리지 않음
+# 실행하며 생기는 일기 데이터·백업
 .wrangler/
 백업_*.json
 *.sqlite
 *.sqlite-*
 
-# 개인 메모(퍼온 글)
-public/일기 잘 쓰는 법.txt
-
 # 설치물
 node_modules/
 
-# Cloudflare 설정(내 저장소 번호) — 올리지 않음. 견본은 wrangler.example.jsonc
+# Cloudflare 설정 — wrangler.example.jsonc 를 복사해 만든다
 wrangler.jsonc

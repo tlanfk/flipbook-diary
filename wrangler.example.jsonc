@@ -9,7 +9,7 @@
     "run_worker_first": ["/api/*"]
   },
   "d1_databases": [
-    // database_id = Cloudflare 에 만든 일기 저장소. preview_database_id = 내 컴퓨터 서버(서버켜기.bat)가 쓰는 저장소(예전 값 그대로 둬야 내 컴퓨터 일기가 보인다)
+    // database_id = `npx wrangler d1 create diary` 로 만든 저장소 번호. preview_database_id = npm run dev 로 실행할 때 쓰는 저장소
     {
       "binding": "DB",
       "database_name": "diary",

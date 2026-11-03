@@ -25,7 +25,7 @@
 
 ```bash
 npm install
-cp wrangler.example.jsonc wrangler.jsonc   # 설정 파일 만들기 (GitHub 에는 올라가지 않음)
+cp wrangler.example.jsonc wrangler.jsonc   # 설정 파일 만들기
 npm run dev      # http://localhost:8790
 ```
 
