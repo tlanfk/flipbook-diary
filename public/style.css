@@ -253,7 +253,7 @@ button { font: inherit; }
 
 /* 글이 쪽에 다 들어가는지 재는 칸 (화면 밖). 아주 조금 좁게 재서 어느 화면 크기에서도 마지막 줄이 잘리지 않게 한다 */
 .measure { position: fixed; left: -10000px; top: 0; visibility: hidden; width: 530px; height: 600px; }
-.measure .text { width: 99.5%; }
+.measure .text { width: 100%; } /* 재는 칸은 실제 쪽과 같은 크기라 여유를 두지 않는다 */
 
 /* ---------- 폰 ---------- */
 /* 세로 폰: 한 쪽이 화면을 채운다 */

@@ -76,6 +76,33 @@
   measure.append(measureInner);
   document.body.append(measure);
 
+  /**
+   * 재는 칸 크기 = 지금 화면에 실제로 그려진 쪽 크기 (넘김 엔진이 창에 맞춰 늘인 크기).
+   * 크기가 다르면 글자 크기도 달라 줄이 바뀌는 자리가 어긋나서, 들어갈 낱말이 다음 쪽으로 밀린다.
+   */
+  function bookPageSize() {
+    const r = flip.getBoundsRect();
+    return { w: r.pageWidth, h: r.height };
+  }
+  function measureMatchesBook() {
+    const { w, h } = bookPageSize();
+    return Math.abs(parseFloat(measure.style.width) - w) < 0.5 && Math.abs(parseFloat(measure.style.height) - h) < 0.5;
+  }
+
+  /** 모든 일기를 쪽으로 나눠 그린다. 그려 보니 실제 쪽 크기가 잰 크기와 다르면 그 크기로 다시 재서 한 번 더 그린다 */
+  function paginateAndRender(pickPage) {
+    slices = entries.map(paginate);
+    buildLayout();
+    render(pickPage());
+    if (measureMatchesBook()) return;
+    const { w, h } = bookPageSize();
+    measure.style.width = `${w}px`;
+    measure.style.height = `${h}px`;
+    slices = entries.map(paginate);
+    buildLayout();
+    render(pickPage());
+  }
+
   // 쪽 끝의 줄바꿈·빈칸은 자리를 차지하지 않는 것으로 친다 (문단 끝 빈 줄 때문에 마지막 낱말이 다음 쪽으로 밀리지 않게)
   const fits = (text) => {
     measureText.value = text.trimEnd();
@@ -321,6 +348,8 @@
     newBtn.disabled = false;
     modeBtn.textContent = '편집모드';
     render(page);
+    // 쓰는 동안 창 크기를 바꿨으면 이제 그 크기로 쪽을 다시 나눈다
+    if (view.kind === 'pc' && !measureMatchesBook()) relayout();
   }
 
   modeBtn.addEventListener('click', () => {
@@ -433,14 +462,11 @@
     if (editing) syncEntries();
     const cur = layout[flip.getCurrentPageIndex()];
     applyView();
-    slices = entries.map(paginate);
-    buildLayout();
-    let page = 0;
-    if (cur && cur.entry >= 0) {
+    paginateAndRender(() => {
+      if (!cur || cur.entry < 0) return 0;
       const found = layout.findIndex((p) => p.entry === cur.entry && cur.start < p.start + Math.max(1, p.text.length));
-      if (found >= 0) page = found;
-    }
-    render(page);
+      return found >= 0 ? found : 0;
+    });
   }
   let relayoutTimer = 0;
   const scheduleRelayout = () => {
@@ -449,6 +475,14 @@
   };
   window.matchMedia(PHONE_QUERY).addEventListener('change', scheduleRelayout);
   window.matchMedia(PORTRAIT_QUERY).addEventListener('change', scheduleRelayout);
+  // PC 창 크기를 바꾸면 쪽이 커지거나 작아지므로 그 크기로 쪽을 다시 나눈다 (글 쓰는 중에는 저장한 뒤에)
+  let resizeTimer = 0;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+      if (flip && view.kind === 'pc' && !editing && !measureMatchesBook()) relayout();
+    }, 300);
+  });
 
   /** 처음 버전(쪽 글 배열)으로 저장된 것은 이어진 글 하나로 합친다 */
   function readEntries(data) {
@@ -470,9 +504,7 @@
         new Promise((r) => setTimeout(r, 3000)),
       ]);
       applyView();
-      slices = entries.map(paginate);
-      buildLayout();
-      render(0);
+      paginateAndRender(() => 0);
       msg.hidden = true;
       modeBtn.disabled = false;
     } catch {
