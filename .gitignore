@@ -9,3 +9,6 @@ public/일기 잘 쓰는 법.txt
 
 # 설치물
 node_modules/
+
+# Cloudflare 설정(내 저장소 번호) — 올리지 않음. 견본은 wrangler.example.jsonc
+wrangler.jsonc
