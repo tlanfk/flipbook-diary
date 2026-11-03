@@ -35,3 +35,7 @@ npm run dev      # http://localhost:8790
 npx wrangler d1 create diary   # 나온 database_id 를 wrangler.jsonc 에 넣기
 npm run deploy
 ```
+
+## 라이선스
+
+MIT — [LICENSE](LICENSE). 책 넘김 엔진(`vendor/page-flip/`)은 StPageFlip(MIT, Nodlik)을 고친 것이라 그 폴더의 LICENSE 도 따릅니다.

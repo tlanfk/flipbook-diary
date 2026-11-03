@@ -1,6 +1,7 @@
 {
   "name": "diary",
   "private": true,
+  "license": "MIT",
   "scripts": {
     "build": "esbuild vendor/page-flip/PageFlip.ts --bundle --format=iife --global-name=St --minify --outfile=public/page-flip.js",
     "dev": "npm run build && wrangler dev --port 8790",
