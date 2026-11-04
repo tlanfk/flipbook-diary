@@ -214,19 +214,19 @@ button { font: inherit; }
   resize: none;
   overflow: hidden;
   white-space: pre-wrap;
-  word-break: keep-all;
+  word-break: normal; /* 한글은 낱말 중간에서도 줄을 바꿔 줄을 끝까지 채운다 */
   overflow-wrap: break-word;
   pointer-events: none; /* 읽을 때는 끌어서 넘기기가 되게 */
 }
 .editing .text { pointer-events: auto; cursor: text; user-select: text; -webkit-user-select: text; }
 .text, .hl { grid-area: 1 / 1; }
-/* 낱말을 쪼개지 않아 줄 끝에 남는 빈칸을 낱말 사이로 나눠 오른쪽 끝을 맞춘다 (줄바꿈 자리는 그대로) */
+/* 줄 끝에 남는 글자 한 칸보다 작은 자리를 나눠 오른쪽 끝을 맞춘다 */
 .text, .hl { text-align: justify; }
 /* 검색해서 고른 자리 표시: 글 칸 뒤에 같은 글을 투명하게 깔고 찾은 부분만 노란색으로 칠한다 */
 .hl {
   overflow: hidden;
   white-space: pre-wrap;
-  word-break: keep-all;
+  word-break: normal;
   overflow-wrap: break-word;
   color: transparent;
   pointer-events: none;
